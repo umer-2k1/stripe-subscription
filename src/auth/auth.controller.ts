@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
