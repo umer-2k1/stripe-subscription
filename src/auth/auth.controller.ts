@@ -9,17 +9,25 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { ApiCommonResponses } from 'src/swagger/decorators/swagger.decorators';
+import { SignupDto } from './dto/signup.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() createUserDto: any) {
+  @ApiCommonResponses()
+  @ApiBody({ type: SignupDto })
+  async register(@Body() createUserDto: SignupDto) {
     return this.authService.createUser(createUserDto);
   }
 
   @Post('login')
+  @ApiCommonResponses()
+  @ApiResponse({ status: 200, description: 'Successful Login' })
   async login(@Body() body) {
     const user = await this.authService.validateUser(body.email, body.password);
     return this.authService.login(user);
