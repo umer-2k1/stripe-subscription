@@ -2,15 +2,17 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
+  Param,
   Post,
   Request,
   UseGuards,
-  Param,
 } from '@nestjs/common';
+import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { SuccessResponse } from 'src/response/dto/response.dto';
 import { ApiCommonResponses } from 'src/swagger/decorators/swagger.decorators';
 import { SignupDto } from './dto/signup.dto';
 
@@ -22,7 +24,14 @@ export class AuthController {
   @ApiCommonResponses()
   @ApiBody({ type: SignupDto })
   async register(@Body() createUserDto: SignupDto) {
-    return this.authService.createUser(createUserDto);
+    const user = await this.authService.createUser(createUserDto);
+    return new SuccessResponse(
+      HttpStatus.CREATED,
+      'User registered successfully',
+      {
+        user,
+      },
+    );
   }
 
   @Post('login')
@@ -30,28 +39,53 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful Login' })
   async login(@Body() body) {
     const user = await this.authService.validateUser(body.email, body.password);
-    return this.authService.login(user);
+    const loginResponse = await this.authService.login(user);
+    return new SuccessResponse(
+      HttpStatus.OK,
+      'Login successful',
+      loginResponse,
+    );
   }
 
   @Post('refresh')
   async refreshToken(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshToken(refreshToken);
+    const newTokens = await this.authService.refreshToken(refreshToken);
+    return new SuccessResponse(
+      HttpStatus.OK,
+      'Token refreshed successfully',
+      newTokens,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Request() req) {
-    return this.authService.logout(req.user._id);
+    this.authService.logout(req.user._id);
+    return new SuccessResponse(
+      HttpStatus.OK,
+      'User logged out successfully',
+      null,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Request() req) {
-    return this.authService.findById(req.user._id);
+    const userProfile = await this.authService.findById(req.user._id);
+    return new SuccessResponse(
+      HttpStatus.OK,
+      'User profile retrieved successfully',
+      userProfile,
+    );
   }
 
   @Get(':id')
   async getUserById(@Param('id') id: string) {
-    return this.authService.findById(id);
+    const user = await this.authService.findById(id);
+    return new SuccessResponse(
+      HttpStatus.OK,
+      'User retrieved successfully',
+      user,
+    );
   }
 }
