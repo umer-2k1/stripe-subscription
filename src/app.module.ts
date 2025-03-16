@@ -7,6 +7,7 @@ import { connectDB, mongooseConfig } from '@config/mongoose.config';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { UserModule } from './user/user.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     AdminModule,
     UserModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

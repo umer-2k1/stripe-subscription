@@ -16,6 +16,9 @@ class User {
   password: string;
 
   @Prop({ default: null })
+  stripeCustomerId: string;
+
+  @Prop({ default: null })
   refreshToken?: string;
 
   @Prop({ default: null })
