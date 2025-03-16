@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,6 +18,7 @@ import { SuccessResponse } from 'src/response/dto/response.dto';
 import { ApiCommonResponses } from 'src/swagger/decorators/swagger.decorators';
 import { CreatePlanDto } from './dto/plan/create-plan.dto';
 import { SubscriptionService } from './subscription.service';
+import { CreateSubscriptionDto } from './dto/subscription/create-subscription.dto';
 
 @Controller('subscription')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -40,5 +42,25 @@ export class SubscriptionController {
   async getSubscriptionPlans() {
     const plans = await this.subscriptionService.getPlans();
     return new SuccessResponse(HttpStatus.OK, 'Stripe Plans fetched', plans);
+  }
+
+  // Create Subscription
+  @Post('')
+  @UseGuards(JwtAuthGuard)
+  @ApiCommonResponses()
+  @ApiBody({ type: CreateSubscriptionDto })
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async createSubscription(
+    @Req() req: Request,
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+  ) {
+    const user = req.user;
+    const plan = await this.subscriptionService.createSubscription(
+      user,
+      createSubscriptionDto,
+    );
+    return new SuccessResponse(HttpStatus.CREATED, 'Stripe Plan created', {
+      stripe: plan,
+    });
   }
 }

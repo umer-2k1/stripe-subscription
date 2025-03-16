@@ -15,7 +15,7 @@ class Subscription {
   @Prop({ unique: true, required: true })
   stripeSubscriptionId: string;
 
-  @Prop({ default: 'active' })
+  @Prop({ default: 'active', enum: ['active', 'canceled', 'paused', 'unpaid'] })
   status: string;
 
   @Prop({ default: Date.now })
@@ -23,6 +23,9 @@ class Subscription {
 
   @Prop()
   endDate?: Date;
+
+  @Prop()
+  canceledAt?: Date;
 }
 
 const SubscriptionSchema = SchemaFactory.createForClass(Subscription);
